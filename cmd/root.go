@@ -5,7 +5,6 @@ import (
     "os"
     "time"
 	"sync"
-
     "pro7_finder/finder"
 
     "github.com/spf13/cobra"
@@ -15,6 +14,7 @@ var (
     dir      string
     fileName string
     method   string
+	excludeDir [] string
 )
 
 var rootCmd = &cobra.Command{
@@ -30,6 +30,10 @@ var rootCmd = &cobra.Command{
 
         f := &finder.Finder{}
         start := time.Now()
+
+		if len(excludeDir) > 0 {
+			f.ToMap(excludeDir)
+		}
 
         switch method {
         case "job":
@@ -55,6 +59,8 @@ func init() {
     rootCmd.Flags().StringVarP(&dir, "dir", "d", ".", "Directory to search in")
     rootCmd.Flags().StringVarP(&fileName, "name", "n", "", "File name to search for")
     rootCmd.Flags().StringVarP(&method, "method", "m", "job", "Search method: job or sem")
+	rootCmd.Flags().StringSliceVar(&excludeDir, "exclude", [] string {}, "Exclude search from")
+
     rootCmd.MarkFlagRequired("name")
 }
 

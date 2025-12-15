@@ -2,9 +2,9 @@ package finder
 
 func (f *Finder) ToMap(excludeDir []string) {
 	f.Once.Do(func() {
-		mp := make(map [string]struct {}, len(excludeDir))
+		f.excludeMap = make(map [string]struct {}, len(excludeDir))
 		for _, v := range excludeDir {
-			mp[v] = struct{}{}
+			f.excludeMap[v] = struct{}{}
 		}
 	})
 }
