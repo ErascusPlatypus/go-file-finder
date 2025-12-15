@@ -2,6 +2,7 @@ package finder
 
 import (
 	"sync"
+	"regexp"
 )
 
 type Finder struct {
@@ -10,4 +11,8 @@ type Finder struct {
 
 	excludeMap map [string] struct {}
 	Once sync.Once
+
+	re *regexp.Regexp
+
+
 }

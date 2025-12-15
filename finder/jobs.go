@@ -18,10 +18,10 @@ func (f *Finder) processDir(dir, fileName string, dirs chan<- string, wg *sync.W
 		if e.IsDir() && !f.isExcluded(e.Name()) {
 			wg.Add(1)
 
-			dirs <- path
-			// go func (p string)  {
-			// 	dirs <- p 
-			// } (path)
+			// dirs <- path
+			go func (p string)  {
+				dirs <- p 
+			} (path)
 
 		} else if e.Name() == fileName {
 			f.mu.Lock()
