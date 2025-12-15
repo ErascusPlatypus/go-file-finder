@@ -18,9 +18,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-    Use:   "finder",
+    Use:   "file-finder",
     Short: "A fast file finder CLI tool",
-    Long:  `A CLI tool to search for files in a directory using concurrent algorithms.`,
+    Long:  `A CLI tool to search for files in a directory using concurrent algorithms and compare execution speeds.`,
     Run: func(cmd *cobra.Command, args []string) {
         if dir == "" || fileName == "" {
             fmt.Println("Error: both --dir and --name flags are required")
