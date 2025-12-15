@@ -8,7 +8,7 @@ import (
 
 var sem = make(chan	struct {}, 20)
 
-func (f *Finder) SemFinder(dir string, fileName string, wg *sync.WaitGroup) {
+func (f *Finder) SemFinder(dir, fileName string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	sem <- struct{}{}
@@ -25,7 +25,7 @@ func (f *Finder) SemFinder(dir string, fileName string, wg *sync.WaitGroup) {
 	for _, e := range entries {
 		path := filepath.Join(dir, e.Name())
 
-		if e.IsDir() {
+		if e.IsDir() && !f.isExcluded(e.Name()) {			
 			wg.Add(1)
 			go f.SemFinder(path, fileName, wg) 
 		} else if e.Name() == fileName {

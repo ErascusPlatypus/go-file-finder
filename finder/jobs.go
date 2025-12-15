@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func (f *Finder) processDir(dir string, fileName string, dirs chan<- string, wg *sync.WaitGroup) {
+func (f *Finder) processDir(dir, fileName string, dirs chan<- string, wg *sync.WaitGroup) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return
@@ -15,11 +15,14 @@ func (f *Finder) processDir(dir string, fileName string, dirs chan<- string, wg 
 	for _, e := range entries {
 		path := filepath.Join(dir, e.Name())
 		
-		if e.IsDir() {
+		if e.IsDir() && !f.isExcluded(e.Name()) {
 			wg.Add(1)
-			go func (p string)  {
-				dirs <- p 
-			} (path)
+
+			dirs <- path
+			// go func (p string)  {
+			// 	dirs <- p 
+			// } (path)
+
 		} else if e.Name() == fileName {
 			f.mu.Lock()
 			f.Res = append(f.Res, path)
@@ -29,7 +32,7 @@ func (f *Finder) processDir(dir string, fileName string, dirs chan<- string, wg 
 }
 
 
-func (f *Finder) JobFinder(root string, fileName string) {
+func (f *Finder) JobFinder(root, fileName string) {
 	var dirWG sync.WaitGroup
 	var workerWG sync.WaitGroup
 
