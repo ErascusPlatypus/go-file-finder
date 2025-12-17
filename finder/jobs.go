@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func (f *Finder) processDir(dir, fileName string, dirs chan<- string, wg *sync.WaitGroup) {
+func (f *Finder) processDir(dir, fileName string, dirs chan<- string, regexFlag bool, wg *sync.WaitGroup) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return
@@ -14,25 +14,27 @@ func (f *Finder) processDir(dir, fileName string, dirs chan<- string, wg *sync.W
 	
 	for _, e := range entries {
 		path := filepath.Join(dir, e.Name())
+
+		normalSearch := (e.Name() == fileName) 
+		regexSearch := (f.re != nil && f.re.MatchString(e.Name()))
 		
 		if e.IsDir() && !f.isExcluded(e.Name()) {
 			wg.Add(1)
 
-			// dirs <- path
 			go func (p string)  {
 				dirs <- p 
 			} (path)
 
-		} else if e.Name() == fileName {
-			f.mu.Lock()
-			f.Res = append(f.Res, path)
-			f.mu.Unlock()
+		} else if regexFlag && regexSearch {
+			f.appendVal(path)
+		} else if !regexFlag && normalSearch {
+			f.appendVal(path)
 		}
 	}
 }
 
 
-func (f *Finder) JobFinder(root, fileName string) {
+func (f *Finder) JobFinder(root, fileName string, regexFlag bool) {
 	var dirWG sync.WaitGroup
 	var workerWG sync.WaitGroup
 
@@ -43,7 +45,7 @@ func (f *Finder) JobFinder(root, fileName string) {
 		go func() {
 			defer workerWG.Done()
 			for dir := range dirs {
-				f.processDir(dir, fileName, dirs, &dirWG)
+				f.processDir(dir, fileName, dirs, regexFlag, &dirWG)
 				dirWG.Done()
 			}
 		}()

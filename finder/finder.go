@@ -13,6 +13,4 @@ type Finder struct {
 	Once sync.Once
 
 	re *regexp.Regexp
-
-
 }

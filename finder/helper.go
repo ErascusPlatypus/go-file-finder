@@ -26,3 +26,9 @@ func (f *Finder) SetRegex(pattern string) error {
 
 	return nil 
 }
+
+func (f *Finder) appendVal(path string) {
+	f.mu.Lock()
+	f.Res = append(f.Res, path)
+	f.mu.Unlock()
+}
